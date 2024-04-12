@@ -16,7 +16,8 @@
 //
 // Execute `rustlings hint quiz3` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
+
+use std::ptr::addr_eq;
 
 pub struct ReportCard {
     pub grade: f32,
@@ -24,10 +25,27 @@ pub struct ReportCard {
     pub student_age: u8,
 }
 
+pub trait Alphabetical {
+    fn a_print(&self) -> String;
+}
+
 impl ReportCard {
     pub fn print(&self) -> String {
         format!("{} ({}) - achieved a grade of {}",
             &self.student_name, &self.student_age, &self.grade)
+    }
+}
+
+impl Alphabetical for ReportCard {
+    fn a_print(&self) -> String {
+        let mut a_grade = String::from("");
+        if self.grade > 2.0 {
+            a_grade = String::from("A+");
+        }else {
+            a_grade = String::from("A");
+        };
+        format!("{} ({}) - achieved a grade of {}",
+            &self.student_name, &self.student_age, a_grade)
     }
 }
 
@@ -57,7 +75,7 @@ mod tests {
             student_age: 11,
         };
         assert_eq!(
-            report_card.print(),
+            report_card.a_print(),
             "Gary Plotter (11) - achieved a grade of A+"
         );
     }
