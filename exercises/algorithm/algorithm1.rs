@@ -2,7 +2,7 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -29,13 +29,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T:Clone + std::cmp::PartialOrd> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T:Clone + std::cmp::PartialOrd> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -62,21 +62,47 @@ impl<T> LinkedList<T> {
 
     fn get_ith_node(&mut self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<&T> {
         match node {
-            None => None,
+            None => None, 
             Some(next_ptr) => match index {
                 0 => Some(unsafe { &(*next_ptr.as_ptr()).val }),
                 _ => self.get_ith_node(unsafe { (*next_ptr.as_ptr()).next }, index - 1),
             },
         }
     }
+
+    
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+		let mut merged_list = Self::new();
+
+        let mut node_a = list_a.start;
+        let mut node_b = list_b.start;
+
+        while let (Some(a), Some(b)) = (node_a, node_b) {
+            let val_a = unsafe { a.as_ref().val.clone() };
+            let val_b = unsafe { b.as_ref().val.clone() };
+
+            if val_a <= val_b {
+                merged_list.add(val_a);
+                node_a = unsafe{ a.as_ref().next };
+            } else {
+                merged_list.add(val_b);
+                node_b = unsafe{ b.as_ref().next };
+            }
         }
+
+            while let Some(a) = node_a {
+                merged_list.add(unsafe { a.as_ref().val.clone() });
+                node_a = unsafe{ a.as_ref().next };
+            }
+
+            while let Some(b) = node_b {
+                merged_list.add(unsafe { b.as_ref().val.clone() });
+                node_b = unsafe{ b.as_ref().next };
+        }
+
+        merged_list
 	}
 }
 
